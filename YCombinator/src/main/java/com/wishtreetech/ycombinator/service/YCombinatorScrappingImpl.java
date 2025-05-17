@@ -199,6 +199,7 @@ public class YCombinatorScrappingImpl implements CompanyScraping<String,String, 
                     : "N/A";
 
 
+
             // Extract LinkedIn and Twitter (X) links
             String linkedIn = "N/A";
             String twitter = "N/A";
