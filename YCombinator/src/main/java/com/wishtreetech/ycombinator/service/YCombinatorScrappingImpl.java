@@ -198,6 +198,8 @@ public class YCombinatorScrappingImpl implements CompanyScraping<String,String, 
                     ? card.selectFirst("div.pt-1").text().trim()
                     : "N/A";
 
+            System.out.println("role");
+
             // Extract LinkedIn and Twitter (X) links
             String linkedIn = "N/A";
             String twitter = "N/A";
