@@ -16,13 +16,13 @@ pipeline {
                     if (branch.contains('develop')) {
                         def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
                                                 def author = sh(script: "git log -1 --pretty=%an", returnStdout: true).trim()
-                                                def fromBranchMatch = (commitMessage =~ /Merge pull request #\d+ from [^\/]+\/([^\n]+)/)
-                                                def fromBranch = fromBranchMatch ? fromBranchMatch[0][1] : "unknown"
+
+                                                // Get second parent of the merge commit (source branch)
+                                                def fromBranch = sh(script: "git log -1 --pretty=%P | cut -d' ' -f2 | xargs -I{} git name-rev --name-only {}", returnStdout: true).trim()
 
                                                 def message = """{
                           "text": "*Git Merge Notification*\\n\\n*From:* ${fromBranch}\\n*To:* develop\\n*Commit:* ${commitMessage}\\n*Merged by:* ${author}"
                         }"""
-
                         sh """
                           curl -X POST -H 'Content-Type: application/json' \
                           -d '${message}' \
