@@ -6,31 +6,32 @@ pipeline {
     }
 
     stages {
-        stage('Check Branch') {
-            when {
-                branch 'develop'
-            }
+        stage('Check and Notify') {
             steps {
                 script {
-                    def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
-                    def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
-                    def sourceBranch = sh(script: "git log -1 --pretty=%D", returnStdout: true).trim()
+                    // Print current branch
+                    echo "Current branch: ${env.BRANCH_NAME}"
 
-                    def message = """
-                    {
-                      "text": "*Git Merge Notification*\\n
-                      Author: ${author}\\n
-                      Commit: ${commitMessage}\\n
-                      Branch: ${env.BRANCH_NAME}\\n
-                      Info: Merged into develop"
+                    if (env.BRANCH_NAME == 'develop') {
+                        def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                        def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
+                        def message = """
+                        {
+                          "text": "*Git Merge Notification*\\n
+                          Author: ${author}\\n
+                          Commit: ${commitMessage}\\n
+                          Branch: ${env.BRANCH_NAME}\\n
+                          Info: Merged into develop"
+                        }
+                        """
+                        sh """
+                          curl -X POST -H 'Content-Type: application/json' \
+                          -d '${message}' \
+                          '${GOOGLE_CHAT_WEBHOOK}'
+                        """
+                    } else {
+                        echo "Not develop branch. Skipping notification."
                     }
-                    """
-
-                    sh """
-                      curl -X POST -H 'Content-Type: application/json' \
-                      -d '${message}' \
-                      '${GOOGLE_CHAT_WEBHOOK}'
-                    """
                 }
             }
         }
