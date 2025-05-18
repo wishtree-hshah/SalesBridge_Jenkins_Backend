@@ -15,16 +15,10 @@ pipeline {
 
                     if (branch.contains('develop')) {
                         def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
-                        def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
-                        def message = """
-                        {
-                          "text": "*Git Merge Notification*\\n
-                          Author: ${author}\\n
-                          Commit: ${commitMessage}\\n
-                          Branch: ${branch}\\n
-                          Info: Merged into develop"
-                        }
-                        """
+                                                def author = sh(script: "git log -1 --pretty=format:%an", returnStdout: true).trim()
+                                                def message = """{
+                          "text": "*Git Merge Notification*\\n\\n*Author:* ${author}\\n*Commit:* ${commitMessage}\\n*Branch:* ${branch}\\n*Info:* Code has been merged into *develop*"
+                        }"""
                         sh """
                           curl -X POST -H 'Content-Type: application/json' \
                           -d '${message}' \
