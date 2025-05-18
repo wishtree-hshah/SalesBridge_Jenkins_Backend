@@ -115,9 +115,7 @@ public class YCombinatorScrappingImpl implements CompanyScraping<String,String, 
 
         try {
             driver.get(companyUrl);
-            // Wait for a specific element to be present before continuing
 
-            // Parse the page source with Jsoup
             Document document = Jsoup.parse(driver.getPageSource());
 
             // Extract data from the document
