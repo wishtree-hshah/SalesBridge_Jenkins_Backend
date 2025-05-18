@@ -9,10 +9,11 @@ pipeline {
         stage('Check and Notify') {
             steps {
                 script {
-                    // Print current branch
-                    echo "Current branch: ${env.BRANCH_NAME}"
+                    // Get current branch manually
+                    def branch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    echo "Detected branch: ${branch}"
 
-                    if (env.BRANCH_NAME == 'develop') {
+                    if (branch == 'develop') {
                         def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
                         def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
                         def message = """
@@ -20,7 +21,7 @@ pipeline {
                           "text": "*Git Merge Notification*\\n
                           Author: ${author}\\n
                           Commit: ${commitMessage}\\n
-                          Branch: ${env.BRANCH_NAME}\\n
+                          Branch: ${branch}\\n
                           Info: Merged into develop"
                         }
                         """
