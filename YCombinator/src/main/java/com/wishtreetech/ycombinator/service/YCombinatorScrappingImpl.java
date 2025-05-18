@@ -214,6 +214,7 @@ public class YCombinatorScrappingImpl implements CompanyScraping<String,String, 
                 }
             }
 
+
             // Add to list
             founders.add(new Founder(name, role, linkedIn, twitter, imageUrl));
         }
