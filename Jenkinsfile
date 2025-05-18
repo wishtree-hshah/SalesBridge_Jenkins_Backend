@@ -9,11 +9,11 @@ pipeline {
         stage('Check and Notify') {
             steps {
                 script {
-                    // Get current branch manually
-                    def branch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    // More reliable branch detection in detached HEAD
+                    def branch = sh(script: "git name-rev --name-only HEAD", returnStdout: true).trim()
                     echo "Detected branch: ${branch}"
 
-                    if (branch == 'develop') {
+                    if (branch.contains('develop')) {
                         def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
                         def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
                         def message = """
