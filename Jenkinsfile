@@ -18,11 +18,11 @@ pipeline {
                         def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
                         def message = """
                         {
-                          "text": "*Git Merge Notification*\\n
-                          Author: ${author}\\n
-                          Commit: ${commitMessage}\\n
-                          Branch: ${branch}\\n
-                          Info: Merged into develop"
+                          "text": "*Git Merge Notification*\\n\\n" +
+                                  "*Author:* ${author}\\n" +
+                                  "*Commit:* ${commitMessage.trim()}\\n" +
+                                  "*Branch:* ${branch.trim()}\\n" +
+                                  "*Info:* Code has been merged into *develop*"
                         }
                         """
                         sh """
