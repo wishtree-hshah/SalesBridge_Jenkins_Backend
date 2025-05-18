@@ -2,47 +2,35 @@ pipeline {
     agent any
 
     environment {
-        GOOGLE_CHAT_WEBHOOK = credentials('google_chat_webhook')
+        GOOGLE_CHAT_WEBHOOK = credentials('GOOGLE_CHAT_WEBHOOK')
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Build Spring Boot') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                sh './mvnw clean install' // or 'mvn clean install' if you’re not using wrapper
-            }
-        }
-
-        stage('Notify on Merge to Develop') {
+        stage('Check Branch') {
             when {
                 branch 'develop'
             }
             steps {
                 script {
-                    // Check if this was a merge commit
-                    def isMerge = sh(script: "git log -1 --pretty=%P | wc -w", returnStdout: true).trim().toInteger() > 1
+                    def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                    def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
+                    def sourceBranch = sh(script: "git log -1 --pretty=%D", returnStdout: true).trim()
 
-                    if (isMerge) {
-                        def msg = """
-                        {
-                          "text": "🚀 A branch was merged into *develop* in project `${env.JOB_NAME}`.\n🔀 Commit: `${env.GIT_COMMIT}`"
-                        }
-                        """
-                        sh """
-                        curl -X POST -H 'Content-Type: application/json' \
-                        -d '${msg}' "${GOOGLE_CHAT_WEBHOOK}"
-                        """
-                    } else {
-                        echo "This was not a merge commit into develop."
+                    def message = """
+                    {
+                      "text": "*Git Merge Notification*\\n
+                      Author: ${author}\\n
+                      Commit: ${commitMessage}\\n
+                      Branch: ${env.BRANCH_NAME}\\n
+                      Info: Merged into develop"
                     }
+                    """
+
+                    sh """
+                      curl -X POST -H 'Content-Type: application/json' \
+                      -d '${message}' \
+                      '${GOOGLE_CHAT_WEBHOOK}'
+                    """
                 }
             }
         }
