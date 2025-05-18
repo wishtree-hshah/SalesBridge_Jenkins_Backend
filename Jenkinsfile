@@ -97,11 +97,14 @@ pipeline {
 
                     // Send notification if message is set
                     if (message) {
-                        sh """
-                          curl -X POST -H 'Content-Type: application/json' \
-                          -d '${message}' \
-                          '${GOOGLE_CHAT_WEBHOOK}'
-                        """
+                        withCredentials([string(credentialsId: 'GOOGLE_CHAT_WEBHOOK', variable: 'WEBHOOK')]) {
+                            sh """
+                              curl -X POST -H 'Content-Type: application/json' \
+                              -d '${message}' \
+                              "\$WEBHOOK"
+                            """
+                        }
+
                     }
                 }
             }
