@@ -212,6 +212,7 @@ public class YCombinatorScrappingImpl implements CompanyScraping<String,String, 
                 } else if (label.contains("twitter") || label.contains("x")) {
                     twitter = href;
                 }
+
             }
 
 
