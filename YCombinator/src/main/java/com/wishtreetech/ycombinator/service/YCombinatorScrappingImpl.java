@@ -136,6 +136,7 @@ public class YCombinatorScrappingImpl implements CompanyScraping<String,String, 
             }
         }
     }
+    
 
     private String extractCompanyName(Document document) {
         Element companyNameElement = document.selectFirst("div.flex.items-center.gap-x-3 h1");
